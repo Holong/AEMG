@@ -46,6 +46,10 @@ d = esexml.design()
                 str_HW += "p.addPort(\"" + port_name + "\")\n"
                 str_HW += "d.addConn(\"" + IP + "\",\"" + port_name + "\",\"M\",\"" + bus + "\")\n\n"
                 index += 1
+	
+            if len(HW_G.node[IP]['process']) > 1:
+                str_HW += "p.set_rtos(1)\n"
+                str_HW += "p.setRtosType(\"xilkernel\")\n\n"	
 
             for p in HW_G.node[IP]['process']:
                 str_HW += "p.addProc(\"" + p.name + "\")\n"
