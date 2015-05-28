@@ -86,9 +86,6 @@ HW_G.add_edge("CPU3","OPB0")
 HW_G.add_edge("CPU4","OPB0")
 HW_G.add_edge("TX0","OPB0")
 
-print(HW_G.nodes())
-print(HW_G.edges())
-
 PROC_G = nx.DiGraph()
 
 PROC_G.add_nodes_from(["readbmp", "chendct", "quantize", "zigzag", "huffencode"])
@@ -97,19 +94,10 @@ PROC_G.node['chendct']['HW'] = "CPU1"
 PROC_G.node['quantize']['HW'] = "CPU2"
 PROC_G.node['zigzag']['HW'] = "CPU3"
 PROC_G.node['huffencode']['HW'] = "CPU4"
-
-PROC_G.add_edge("readbmp", "chendct")
-PROC_G["readbmp"]["chendct"]["name"] = "r2c"
-PROC_G["readbmp"]["chendct"]["writer_if"] = "r2c_if"
-PROC_G["readbmp"]["chendct"]["reader_if"] = "r2c_if"
-PROC_G["readbmp"]["chendct"]["size"] = 256
-
+PROC_G.add_edge("readbmp", "chendct", name = 'r2c', writer_if = 'r2c_if', reader_if = "r2c_if", size = 256)
 PROC_G.add_edge("chendct", "quantize", name = 'c2q', writer_if = 'c2q_if', reader_if = 'c2q_if', size = 256)
 PROC_G.add_edge("quantize", "zigzag", name = 'q2z', writer_if = 'q2z_if', reader_if = 'q2z_if', size = 256)
 PROC_G.add_edge("zigzag", "huffencode", name = 'z2h', writer_if = 'z2h_if', reader_if = 'z2h_if', size = 256)
-
-print(PROC_G.nodes())
-print(PROC_G.edges())
 
 Design = {'name':'test1', 'HW' : HW_G, 'PROC' : PROC_G}
 
@@ -174,30 +162,17 @@ HW_G.add_edge("CPU0","OPB0")
 HW_G.add_edge("CPU1","OPB0")
 HW_G.add_edge("TX0","OPB0")
 
-print(HW_G.nodes())
-print(HW_G.edges())
-
 PROC_G = nx.DiGraph()
-
 PROC_G.add_nodes_from(["readbmp", "chendct", "quantize", "zigzag", "huffencode"])
 PROC_G.node['readbmp']['HW'] = "CPU0"
 PROC_G.node['chendct']['HW'] = "CPU0"
 PROC_G.node['quantize']['HW'] = "CPU0"
 PROC_G.node['zigzag']['HW'] = "CPU1"
 PROC_G.node['huffencode']['HW'] = "CPU1"
-
-PROC_G.add_edge("readbmp", "chendct")
-PROC_G["readbmp"]["chendct"]["name"] = "r2c"
-PROC_G["readbmp"]["chendct"]["writer_if"] = "r2c_if"
-PROC_G["readbmp"]["chendct"]["reader_if"] = "r2c_if"
-PROC_G["readbmp"]["chendct"]["size"] = 256
-
+PROC_G.add_edge("readbmp", "chendct", name = 'r2c', writer_if = 'r2c_if', reader_if = "r2c_if", size = 256)
 PROC_G.add_edge("chendct", "quantize", name = 'c2q', writer_if = 'c2q_if', reader_if = 'c2q_if', size = 256)
 PROC_G.add_edge("quantize", "zigzag", name = 'q2z', writer_if = 'q2z_if', reader_if = 'q2z_if', size = 256)
 PROC_G.add_edge("zigzag", "huffencode", name = 'z2h', writer_if = 'z2h_if', reader_if = 'z2h_if', size = 256)
-
-print(PROC_G.nodes())
-print(PROC_G.edges())
 
 Design = {'name':'test2', 'HW' : HW_G, 'PROC' : PROC_G}
 
