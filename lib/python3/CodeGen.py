@@ -24,6 +24,7 @@ d = esexml.design()
     ############## HW start #####################
     str_HW = ''
     HW_G = Design['HW']
+    PROC_G = Design['PROC']
     Node_name = HW_G.nodes()
 
     for IP in Node_name:
@@ -52,19 +53,19 @@ d = esexml.design()
                 str_HW += "p.setRtosType(\"xilkernel\")\n\n"	
 
             for p in HW_G.node[IP]['process']:
-                str_HW += "p.addProc(\"" + p.name + "\")\n"
-                str_HW += "proc = p.getProc(\"" + p.name + "\")\n"
+                str_HW += "p.addProc(\"" + PROC_G.node[p]['info'].name + "\")\n"
+                str_HW += "proc = p.getProc(\"" + PROC_G.node[p]['info'].name + "\")\n"
                 str_HW += "clist = esexml.eseCharList()\n"
-                for i in p.c_file :
+                for i in PROC_G.node[p]['info'].c_file :
                     str_HW += "cname = cpath+\"" + i + "\"\n"
                     str_HW += "clist.append(cname)\n"
                 str_HW += "proc.add_cfiles(clist)\n"
                 str_HW += "hlist = esexml.eseCharList()\n"
-                for i in p.h_file :
+                for i in PROC_G.node[p]['info'].h_file :
                     str_HW += "hname = cpath+\"" + i + "\"\n"
                     str_HW += "hlist.append(hname)\n"
                 str_HW += "proc.add_hfiles(hlist)\n"
-                for i in p.port :
+                for i in PROC_G.node[p]['info'].port :
                     str_HW += "proc.addInterface(\"" + i[0] + "\",esexml.ESE_" + i[1] + ")\n"
                     str_HW += "intf = proc.getInterface(\"" + i[0] + "\")\n"
                     str_HW += "intf.setTypeValue(esexml.ESE_" + i[1] + ",\"" + i[2] + "\")\n"
@@ -86,7 +87,6 @@ d = esexml.design()
 
     ############## CH Start ################
     str_CH = ''
-    PROC_G = Design['PROC']
 
     for edge in  PROC_G.edges():
         ch_name = PROC_G.edge[edge[0]][edge[1]]['name']

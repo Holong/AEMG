@@ -7,7 +7,7 @@
 
 CP      = 	cp -f
 RM	=	rm -rf
-NAME	=	test
+NAME	=	test1
 
 # -- Compilation
 
