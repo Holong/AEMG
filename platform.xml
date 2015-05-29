@@ -1,0 +1,34 @@
+<application>
+    <process name='readbmp'>
+        <cfile>/func_model_srcs/readbmp.c</cfile>
+        <cfile>/func_model_srcs/ReadBmp_aux.c</cfile>
+        <hfile>/func_model_srcs/ReadBmp_aux.h</hfile>
+        <port name='r2c_if' type='write' function='send_r2c' proc='readbmp'></port>
+    </process>
+    <process name='chendct'>
+        <cfile>/func_model_srcs/chendct.c</cfile>
+        <hfile>/func_model_srcs/ChenDCT_aux.h</hfile>
+        <port name='r2c_if' type='read' function='recv_r2c' proc='chendct'></port>
+        <port name='c2q_if' type='write' function='send_c2q' proc='chendct'></port>
+    </process>
+    <process name='quantize'>
+        <cfile>/func_model_srcs/quantize.c</cfile>
+        <cfile>/func_model_srcs/Quantize_aux.c</cfile>
+        <hfile>/func_model_srcs/Quantize_aux.h</hfile>
+        <port name='c2q_if' type='read' function='recv_c2q' proc='quantize'></port>
+        <port name='q2z_if' type='write' function='send_q2z' proc='quantize'></port>
+    </process>
+    <process name='zigzag'>
+        <cfile>/func_model_srcs/zigzag.c</cfile>
+        <cfile>/func_model_srcs/Zigzag_aux.c</cfile>
+        <hfile>/func_model_srcs/Zigzag_aux.h</hfile>
+        <port name='q2z_if' type='read' function='recv_q2z' proc='zigzag'></port>
+        <port name='z2h_if' type='write' function='send_z2h' proc='zigzag'></port>
+    </process>
+    <process name='huffencode'>
+        <cfile>/func_model_srcs/huffencode.c</cfile>
+        <cfile>/func_model_srcs/HuffEncode_aux.c</cfile>
+        <hfile>/func_model_srcs/HuffEncode_aux.h</hfile>
+        <port name='z2h_if' type='read' function='recv_z2h' proc='huffencode'></port>
+    </process>
+</application>
