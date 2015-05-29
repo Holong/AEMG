@@ -8,9 +8,9 @@ def get_app_graph(PROC_G):
     HW_G = make_default_HW_graph(PROC_G)
     Design = {'name':'getPerf', 'HW' : HW_G, 'PROC' : PROC_G}
 
-    APP_G = get_app_performance(Design)
+    PROC_G = get_app_performance(Design)
 
-    return APP_G
+    return PROC_G
 
 def make_default_HW_graph(PROC_G):
 	
@@ -78,12 +78,12 @@ def get_app_performance(Design):
     for str in bus_info:
         bus_cycle.append(str.strip('\t\n').split('\t'))
 
-    for edge in APP_G.edges():
-        edge_name = APP_G[edge[0]][edge[1]]['name']
+    for edge in PROC_G.edges():
+        edge_name = PROC_G[edge[0]][edge[1]]['name']
         
         for list in bus_cycle:
             if list[0] == edge_name:
-                APP_G[edge[0]][edge[1]]['transfer'] = int(list[1])
+                PROC_G[edge[0]][edge[1]]['transfer'] = int(list[1])
     
     bus_file.close()
 
@@ -95,16 +95,16 @@ def get_app_performance(Design):
     for str in com_info:
         com_cycle.append(str.strip('\t\n').split('\t'))
 
-    for node_name in APP_G.nodes():
+    for node_name in PROC_G.nodes():
         tmp_list = []
         for list in com_cycle:
             if list[0] == node_name and 'computation' in tmp_list[0]:
-                APP_G.node[node_name]['cycle'] = int(list[1])
+                PROC_G.node[node_name]['cycle'] = int(list[1])
             tmp_list = list
     
     os.chdir('..')
     shutil.rmtree('.temp')
-    return APP_G
+    return PROC_G
 
 
 
@@ -163,3 +163,9 @@ if __name__ == '__main__':
     PROC_G.add_edge("zigzag", "huffencode", name = 'z2h', writer_if = 'z2h_if', reader_if = 'z2h_if', size = 256)
 
     APP_G = get_app_graph(PROC_G)
+
+    for node_name in APP_G.nodes():
+        print("{0} : {1}".format(node_name, APP_G.node[node_name]))
+
+    for edge_name in APP_G.edges():
+        print("{0} - {1} : {2}".format(edge_name[0], edge_name[1], APP_G.edge[edge_name[0]][edge_name[1]]))
