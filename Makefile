@@ -36,4 +36,4 @@ ttlm: platform
 	cd $(NAME)_timed_TLM && ./tlm
 
 clean:
-	$(RM) *.eds *.xml $(NAME)* .tmp*
+	$(RM) .tmp*

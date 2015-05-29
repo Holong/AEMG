@@ -2,6 +2,7 @@ import networkx as nx
 import CodeGen
 import proc
 import os, shutil
+import xml.etree.ElementTree as ET
 
 def get_app_graph(PROC_G):
 
@@ -101,6 +102,51 @@ def get_app_performance(Design):
     
     os.chdir('..')
     shutil.rmtree('.temp')
+    return PROC_G
+
+def parse_xml(xml_file_name):
+    tree = ET.parse(xml_file_name)
+    root = tree.getroot()
+
+    PROC_G = nx.DiGraph()
+
+    for process in root:
+        proc_name = process.attrib['name']
+        PROC_G.add_node(proc_name)
+        proc_info = proc.Process()
+        proc_info.set_name(proc_name)
+        
+        for info in process:
+            if info.tag == 'cfile':
+                proc_info.set_cfile(info.text)
+            elif info.tag == 'hfile':
+                proc_info.set_hfile(info.text)
+            elif info.tag == 'port':
+                port_name = info.attrib['name']
+                port_type = info.attrib['type']
+                if port_type == 'write':
+                    port_type = 'FIFO_CH_BW'
+                else :
+                    port_type = 'FIFO_CH_BR'
+                port_func = info.attrib['function']
+
+                proc_info.set_process_port(port_name, port_type, port_func)
+        
+        PROC_G.node[proc_name]['info'] = proc_info
+
+    port_list = []
+    for port in root.iter('port'):
+        port_list.append(port)
+
+    for port in port_list:
+        if port.attrib['type'] == 'read':
+            continue
+        for dest_port in port_list:
+            if port.attrib['name'] == dest_port.attrib['name'] and dest_port.attrib['type'] == 'read':
+                break
+        ch_name = port.attrib['name'][:port.attrib['name'].find('_if')]
+        PROC_G.add_edge(port.attrib['proc'], dest_port.attrib['proc'], name = ch_name, writer_if = port.attrib['name'], reader_if = port.attrib['name'], size = 256)
+
     return PROC_G
 
 

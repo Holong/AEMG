@@ -63,6 +63,9 @@ PROC_G.add_edge("chendct", "quantize", name = 'c2q', writer_if = 'c2q_if', reade
 PROC_G.add_edge("quantize", "zigzag", name = 'q2z', writer_if = 'q2z_if', reader_if = 'q2z_if', size = 256)
 PROC_G.add_edge("zigzag", "huffencode", name = 'z2h', writer_if = 'z2h_if', reader_if = 'z2h_if', size = 256)
 
+## Get raw App graph
+PROC_G = PlatformGen.parse_xml('platform.xml')
+
 ## Get Application Performance Graph
 PROC_G = PlatformGen.get_app_graph(PROC_G)
 
