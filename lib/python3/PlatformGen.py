@@ -65,13 +65,10 @@ def get_app_performance(Design):
         os.execl(Design['name'] + '_timed_TLM/tlm', 'tlm')
     print("Estimate complete")
 
-#   APP_G = nx.DiGraph()
-#   APP_G.add_nodes_from(Design['PROC'].nodes())
-#   APP_G.add_edges_from(Design['PROC'].edges())
-#   for edge in APP_G.edges():
-#       APP_G[edge[0]][edge[1]]['name'] = Design['PROC'][edge[0]][edge[1]]['name']
-
 ##  extract bus cycle information ##    
+
+    PROC_G = Design['PROC']
+
     bus_file = open(Design['name'] + '.bus', 'r')
     bus_info = bus_file.readlines()
     bus_cycle = []
@@ -107,7 +104,10 @@ def get_app_performance(Design):
     return PROC_G
 
 
-
+def get_platform_graph(PROC_G):
+## HW Graph Generation Code
+    HW_G = make_default_HW_graph(PROC_G)
+    return HW_G, PROC_G
 
 # test code
 if __name__ == '__main__':

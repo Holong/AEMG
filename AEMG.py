@@ -10,6 +10,7 @@ import networkx as nx
 import proc
 import CodeGen
 import PlatformGen
+import shutil
 
 # Making Design set for test
 PROC_G = nx.DiGraph()
@@ -68,5 +69,31 @@ PROC_G = PlatformGen.get_app_graph(PROC_G)
 ## Get Hardware and Process Graph
 HW_G, PROC_G = PlatformGen.get_platform_graph(PROC_G)
 
-Design = {'name':'test1', 'HW' : HW_G, 'PROC' : PROC_G}
+## Make platform & simulate
+Design = {'name':'test', 'HW' : HW_G, 'PROC' : PROC_G}
+
+shutil.copytree('func_model_srcs', 'result/func_model_srcs')
+os.chdir('result')
 CodeGen.CodeGenerator(Design)
+
+pid = os.fork()
+if pid:
+    pid, status = os.wait()
+else:
+    os.execl(Design['name'] + '.py', Design['name'] + '.py')
+print("eds making complete")
+
+pid = os.fork()
+if pid:
+    pid, status = os.wait()
+else:
+    os.execlp('tlmest', 'tlmest', Design['name'] + '.eds')
+print("Making Timed TLM complete")
+
+pid = os.fork()
+if pid:
+    pid, status = os.wait()
+else:
+    os.execl(Design['name'] + '_timed_TLM/tlm', 'tlm')
+print("Estimate complete")
+
