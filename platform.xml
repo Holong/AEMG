@@ -31,4 +31,5 @@
         <hfile>/func_model_srcs/HuffEncode_aux.h</hfile>
         <port name='z2h_if' type='read' function='recv_z2h' proc='huffencode'></port>
     </process>
+    <constraint msec='1000'></constraint>
 </application>

@@ -111,6 +111,11 @@ def parse_xml(xml_file_name):
     PROC_G = nx.DiGraph()
 
     for process in root:
+
+        if process.tag == 'constraint':
+            PROC_G.graph['time'] = process.attrib['msec']
+            continue
+
         proc_name = process.attrib['name']
         PROC_G.add_node(proc_name)
         proc_info = proc.Process()
