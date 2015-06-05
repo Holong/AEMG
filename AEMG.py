@@ -21,6 +21,9 @@ PROC_G = PlatformGen.get_app_graph(PROC_G)
 ## Get Hardware and Process Graph
 HW_G, PROC_G = PlatformGen.get_platform_graph(PROC_G)
 
+PlatformGen.print_graph_info(HW_G)
+PlatformGen.print_graph_info(PROC_G)
+
 ## Make platform & simulate
 Design = {'name':'test', 'HW' : HW_G, 'PROC' : PROC_G}
 

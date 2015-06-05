@@ -114,6 +114,8 @@ def parse_xml(xml_file_name):
 
         if process.tag == 'constraint':
             PROC_G.graph['time'] = process.attrib['msec']
+            PROC_G.graph['num_pe'] = process.attrib['PE']
+            PROC_G.graph['pe_clk'] = process.attrib['PE_CLK_MHZ']
             continue
 
         proc_name = process.attrib['name']
@@ -154,11 +156,95 @@ def parse_xml(xml_file_name):
 
     return PROC_G
 
+def make_map(num_of_pe, PROC_G):
+    
+    map = {'total_cost':0, 'num_of_pe':0, 'num_of_cycle':0, 'map_info':{}}
+    pe_speed = int(PROC_G.graph['pe_clk'])
+
+    pe_load = []
+    for i in range(0, num_of_pe):
+        pe_load.append(["CPU" + str(i), 0])
+
+    proc_cycle = []
+    for proc_name in PROC_G.nodes():
+        proc_cycle.append((proc_name, PROC_G.node[proc_name]['cycle']))
+
+    proc_cycle.sort(key = lambda x: x[1])
+
+    for proc_name, cycle in proc_cycle:
+        load = cycle / pe_speed
+        pe_load[0][1] += load
+        map['map_info'][proc_name] = pe_load[0][0]
+        pe_load.sort(key = lambda x:x[1])
+
+    map['num_of_pe'] = num_of_pe
+    map['num_of_cycle'] = pe_load[num_of_pe-1][1]
+    map['total_cost'] = map['num_of_cycle']
+
+# return {'total_cost':0, 'num_of_pe':0, 'num_of_cycle':0, 'map_info':{'readbmp':'CPU0', 'chendct':'CPU1', 'quantize':'CPU0', 'zigzag':'CPU1', 'huffencode':'CPU1'}}
+    return map
+
+
+def make_HW_graph(PROC_G, map):
+
+    HW_G = nx.Graph()
+
+    HW_G.add_node("OPB0")
+    HW_G.node["OPB0"]["type"] = "BUS"
+    HW_G.node["OPB0"]["name"] = "OPB"
+
+    HW_G.add_node("TX0")
+    HW_G.node["TX0"]["type"] = "TX"
+    HW_G.node["TX0"]["name"] = "ESETX"
+    HW_G.add_edge("TX0", "OPB0")
+
+    print(HW_G.nodes())
+    print(map['map_info'])
+
+    for proc, cpu_name in map['map_info'].items():
+        PROC_G.node[proc]['HW'] = cpu_name
+        if cpu_name in HW_G.nodes():
+            HW_G.node[cpu_name]['process'].append(proc)
+        else :
+            HW_G.add_node(cpu_name)
+            HW_G.node[cpu_name]['type'] = 'PROCESSOR'
+            HW_G.node[cpu_name]['name'] = 'MICROBLAZE'
+            HW_G.node[cpu_name]['process'] = [proc]
+            HW_G.add_edge(cpu_name, 'OPB0')
+     
+    return HW_G
+
 
 def get_platform_graph(PROC_G):
 ## HW Graph Generation Code
-    HW_G = make_default_HW_graph(PROC_G)
+
+    num_of_max_pe = int(PROC_G.graph['num_pe'])
+    if num_of_max_pe > PROC_G.number_of_nodes():
+        num_of_max_pe = PROC_G.number_of_nodes()
+
+    optimized_map = {'total_cost':0, 'num_of_pe':0, 'num_of_cycle':0, 'map_info':{}}
+    candidate_map = {'total_cost':0, 'num_of_pe':0, 'num_of_cycle':0, 'map_info':{}}
+
+    for num_of_pe in range(num_of_max_pe, 1, -1):
+        candidate_map = make_map(num_of_pe, PROC_G)
+
+        if num_of_pe == num_of_max_pe:
+            optimized_map = candidate_map
+            continue
+
+        if optimized_map['total_cost'] > candidate_map['total_cost']:
+            optimized_map = candidate_map
+
+    HW_G = make_HW_graph(PROC_G, optimized_map)
+
     return HW_G, PROC_G
+
+def print_graph_info(Print_G):
+    for node_name in Print_G.nodes():
+        print("{0} : {1}".format(node_name, Print_G.node[node_name]))
+
+    for edge_name in Print_G.edges():
+        print("{0} - {1} : {2}".format(edge_name[0], edge_name[1], Print_G.edge[edge_name[0]][edge_name[1]]))
 
 # test code
 if __name__ == '__main__':
