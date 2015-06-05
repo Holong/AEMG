@@ -116,6 +116,7 @@ def parse_xml(xml_file_name):
             PROC_G.graph['time'] = process.attrib['msec']
             PROC_G.graph['num_pe'] = process.attrib['PE']
             PROC_G.graph['pe_clk'] = process.attrib['PE_CLK_MHZ']
+            PROC_G.graph['pe_weight'] = process.attrib['PE_WEIGHT']
             continue
 
         proc_name = process.attrib['name']
@@ -177,9 +178,10 @@ def make_map(num_of_pe, PROC_G):
         map['map_info'][proc_name] = pe_load[0][0]
         pe_load.sort(key = lambda x:x[1])
 
+    pe_weight = int(PROC_G.graph['pe_weight']) * 10000000
     map['num_of_pe'] = num_of_pe
     map['num_of_cycle'] = pe_load[num_of_pe-1][1]
-    map['total_cost'] = map['num_of_cycle']
+    map['total_cost'] = map['num_of_cycle'] + map['num_of_pe'] * pe_weight
 
 # return {'total_cost':0, 'num_of_pe':0, 'num_of_cycle':0, 'map_info':{'readbmp':'CPU0', 'chendct':'CPU1', 'quantize':'CPU0', 'zigzag':'CPU1', 'huffencode':'CPU1'}}
     return map
